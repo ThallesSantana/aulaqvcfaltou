@@ -1,0 +1,165 @@
+create database tarefa_mike;
+use tarefa_mike;
+
+create table nomes (
+nome varchar(25)
+);
+
+insert into nomes (nome)
+values
+    ('Roberta'),
+    ('Roberto'),
+    ('Maria Clara'),
+    ('João');
+    
+select upper(nome) as nome_maiusculo
+from nomes;
+
+SELECT nome, LENGTH(nome) AS tamanho
+FROM nomes;
+
+select nome, length(nome) as tamanho
+from nomes;
+
+select 
+	case
+		when nome like 'Maria' then concat('Sra. ', nome)
+        else concat('Sr ', nome)
+	end as nome_com_concat
+from nomes;
+
+create table produtos (
+	produto varchar(255),
+    preco decimal(10,2),
+    quantidade int
+);
+    
+insert into produtos (produto, preco, quantidade)
+values
+    ('Produto A', ROUND(19.98765, 2), 10),
+    ('Produto B', ROUND(25.65432, 2), 15),
+	('Produto C', ROUND(9.5, 2), 20);
+
+select produto, preco, ABS(quantidade) as quantidade_absoluta
+from produtos;
+
+select avg(preco) as media_precos
+from produtos;
+
+create table eventos (
+    data_evento datw
+);
+
+insert into eventos (data_evento) values
+    ('2023-10-10'),
+    ('2023-11-15'),
+    ('2023-12-20'),
+    ('2024-01-05'),
+    ('2024-02-08');
+
+insert into eventos (data_evento)
+values (now());
+
+select datediff(data_final, data_inicial) as numero_de_dias
+from sua_tabela;
+
+select datediff(data_final, data_inicial) AS numero_de_dias
+from eventos;
+
+select data_evento, dayname(data_evento) as nome_dia_semana
+from eventos;
+
+select produto, 
+       preco, 
+       quantidade,
+       if(quantidade > 0, 'Em estoque', 'Fora de estoque') as status_estoque
+from produtos;
+
+select produto,
+       preco,
+       quantidade,
+       case
+           when preco < 50 then 'Barato'
+           when preco >= 50 and preco <= 100 then 'Médio'
+           when preco > 100 then 'Caro'
+           else 'Desconhecido'
+       end as categoria_preco
+from produtos;
+
+select total_valor(10.50, 5) as valor_total;
+
+select produto, preco, quantidade, TOTAL_VALOR(preco, quantidade) as valor_total
+from produtos;
+
+select count(*) as numero_total_de_produtos
+from produtos;
+
+select produto, preco
+from produtos
+where preco = (select max(preco) from produtos);
+
+select produto, preco
+from produtos
+where preco = (select min(preco) from produtos);
+
+select sum(if(quantidade > 0, preco * quantidade, 0)) as soma_total_em_estoque
+from produtos;
+
+DELIMITER //
+
+create procedure CalcularFatorial(in numero int, out resultado bigint)
+begin
+    declare i int default 1;
+    declare fatorial bigint default 1;
+
+    while i <= numero do
+        set fatorial = fatorial * i;
+        set i = i + 1;
+    end while;
+
+    set resultado = fatorial;
+end;
+//
+
+DELIMITER ;
+
+call CalcularFatorial(5, @resultado);
+select @resultado as fatorial;
+
+DELIMITER //
+
+create function f_exponencial(base decimal(10,2), expoente int) returns decimal(10,2)
+begin
+    declare resultado decimal(10,2) default 1;
+    declare i int default 1;
+
+    while i <= expoente do
+        set resultado = resultado * base;
+        set i = i + 1;
+    end while;
+
+    return resultado;
+end;
+//
+
+DELIMITER ;
+
+select f_exponencial(2, 3) as resultado;
+
+DELIMITER //
+
+create function VerificarPalindromo(palavra varchar(255)) returns int
+begin
+    declare reverso varchar(255);
+    
+    set reverso = reverse(palavra);
+    
+    if palavra = reverso then
+        return 1;
+    else
+        return 0;
+    end if;
+end;
+//
+
+DELIMITER ;
